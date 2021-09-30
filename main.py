@@ -69,8 +69,7 @@ class MyApp:
         self.clean_window()
         self.create_form()
     def create_form(self):
-        self.current_focus_entry=1
-        
+        self.current_focus_entry,self.next_focus_entry=-1,-1
         self.entries_form=[] # 0->entry_consommation_RADEEJ 1->entry_prix_RADEEJ 2->entry_etat_initial_compteur 3->entry_etat_final_compteur 4->entry_etat_initial_compteur_Mohcine 5->entry_etat_final_compteur_Mohcine 6->entry_etat_initial_compteur_Mustafa 7->entry_etat_final_compteur_Mustafa
         
         self.create_title("insérer vos informations",10)
@@ -95,7 +94,7 @@ class MyApp:
         self.entries_form.append(Entry(frame_RADEEJ_prix,font=(self.text_familly,self.label_text_size,self.font_style),fg="grey",width=25))
         self.entries_form[1].insert(0,"si possible")
         self.entries_form[1].grid(row=0,column=0)
-        label_DHs_RADEEJ=Label(frame_RADEEJ_prix,font=(self.text_familly,self.label_text_size,self.font_style),fg=self.label_text_color,bg="white",relief="sunken",text=" DHs ")
+        label_DHs_RADEEJ=Label(frame_RADEEJ_prix,font=(self.text_familly,self.label_text_size,self.font_style),fg=self.label_text_color,bg="white",relief="sunken",text="DHs")
         label_DHs_RADEEJ.grid(row=0,column=1)
         frame_RADEEJ_prix.grid(row=1,column=1,padx=10)
         frame_RADEEJ.pack(pady=5)
@@ -114,7 +113,6 @@ class MyApp:
         frame_compteur_initial.grid(row=0,column=1,padx=10)
         
         #new line
-        
         label_etat_final=Label(frame_compteur,font=(self.text_familly,self.label_text_size,self.font_style),fg=self.label_text_color,bg=self.label_background_color,relief="solid",text="Etat final du compteur : ",width=40)
         label_etat_final.grid(row=1,column=0,padx=20)
         frame_compteur_final=Frame(frame_compteur)
@@ -178,14 +176,44 @@ class MyApp:
         label_space=Label(frame_form,text="")
         label_space.pack()
         self.canvas.create_window(self.width/2,self.height*9/20+self.padding*4/5,window=frame_form)
-        
+        self.data_entries=[-1 for _ in range(len(self.entries_form))]
+        #bind the enties to get position
+        self.entries_form[0].bind("<Button-1>",self.entry_0)
+        self.entries_form[1].bind("<Button-1>",self.entry_1)
+        self.entries_form[2].bind("<Button-1>",self.entry_2)
+        self.entries_form[3].bind("<Button-1>",self.entry_3)
+        self.entries_form[4].bind("<Button-1>",self.entry_4)
+        self.entries_form[5].bind("<Button-1>",self.entry_5)
+        self.entries_form[6].bind("<Button-1>",self.entry_6)
+        self.entries_form[7].bind("<Button-1>",self.entry_7)
         #bind the enties
+        for index in range(len(self.entries_form)):
+                self.entries_form[index].bind("<FocusIn>",self.focus_in_entry)
+                self.entries_form[index].bind("<FocusOut>",self.focus_out_entry)
+                self.entries_form[index].bind("<Up>",self.up_entry)
+                self.entries_form[index].bind("<Down>",self.down_entry)
+
+    #bind's functions to get position
+    def entry_0(self,*args):
+        self.next_focus_entry=0
+    def entry_1(self,*args):
+        self.next_focus_entry=1
+    def entry_2(self,*args):
+        self.next_focus_entry=2
+    def entry_3(self,*args):
+        self.next_focus_entry=3
+    def entry_4(self,*args):
+        self.next_focus_entry=4
+    def entry_5(self,*args):
+        self.next_focus_entry=5
+    def entry_6(self,*args):
+        self.next_focus_entry=6
+    def entry_7(self,*args):
+        self.next_focus_entry=7
         
-        self.entries_form[1].bind("<FocusIn>",self.focus_in_entry)
-        self.entries_form[1].bind("<FocusOut>",self.focus_out_entry)    
     #bind's functions
     def focus_in_entry(self,*args)->None:
-        print(args)
+        self.current_focus_entry,self.next_focus_entry=self.next_focus_entry,-1
         if self.current_focus_entry<0 and self.current_focus_entry>=len(self.entries_form):
             return
         if not self.can_it_be_number(self.entries_form[self.current_focus_entry].get()):
@@ -201,15 +229,28 @@ class MyApp:
                 self.entries_form[self.current_focus_entry].insert(0,"si possible")
         self.current_focus_entry=-1
     def up_entry(self,*args):
-        pass
+        self.next_focus_entry=len(self.entries_form)-(len(self.entries_form)-self.current_focus_entry)%len(self.entries_form)-1
+        self.entries_form[self.next_focus_entry].focus()
     def down_entry(self,*args):
-        pass
+        self.next_focus_entry=(self.current_focus_entry+1)%len(self.entries_form)
+        self.entries_form[self.next_focus_entry].focus()
     #other
     def can_it_be_number(self,string_to_check:str)->bool:
-        my_set=set("1 2 3 4 5 6 7 8 9 . ,")
-        for element in string_to_check:
-            if element not in my_set:
-                return False
-        return True
+        try :
+            number=float(string_to_check)
+            if number<0:
+                raise ValueError("ces valeurs devraient etre toujours positive !!")
+            number=abs(number)
+            if self.next_focus_entry!=self.current_focus_entry and self.current_focus_entry in range(len(self.entries_form)) and self.next_focus_entry in range(len(self.entries_form)) :
+                self.data_entries[self.current_focus_entry]=number
+                self.entries_form[self.current_focus_entry].delete(0,END)
+                self.entries_form[self.current_focus_entry].insert(0,number)
+                print(self.data_entries)
+            return True 
+        except:
+            if self.next_focus_entry!=self.current_focus_entry and self.current_focus_entry in range(len(self.entries_form)) and self.next_focus_entry in range(len(self.entries_form)) :
+                self.data_entries[self.current_focus_entry]=-1
+                print(self.data_entries)
+            return False
 if __name__=="__main__" :
     app=MyApp()
