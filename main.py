@@ -4,8 +4,8 @@ from PIL import ImageTk , Image
 class MyApp:
     def __init__(self):
         #size window
-        self.width=1028
-        self.height=720
+        self.width=1100
+        self.height=self.width*720//1028
         self.title_size=50
         self.text_size=30
         self.label_text_size=15
@@ -175,7 +175,7 @@ class MyApp:
 
         label_space=Label(frame_form,text="")
         label_space.pack()
-        self.canvas.create_window(self.width/2,self.height*9/20+self.padding*4/5,window=frame_form)
+        self.canvas.create_window(self.width*4/10,self.height*9/20+self.padding*3/4,window=frame_form)
         self.data_entries=[-1 for _ in range(len(self.entries_form))]
         #bind the enties to get position
         self.entries_form[0].bind("<Button-1>",self.entry_0)
