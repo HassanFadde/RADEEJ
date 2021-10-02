@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import *
-import time
+from tkinter import ttk
+import datetime
 from PIL import ImageTk , Image
 class MyApp:
     def __init__(self):
@@ -70,7 +71,9 @@ class MyApp:
         self.canvas.create_line(self.width/2+300,self.height/5,self.width/2+100,self.height/5,fill=self.border_color,width=5)
     def create_form(self):
         self.current_focus_entry,self.next_focus_entry=-1,-1
+        self.index_focus_combobox,self.index_next_focus_combobox=-1,-1
         self.entries_form=[] # 0->entry_consommation_RADEEJ 1->entry_prix_RADEEJ 2->entry_etat_initial_compteur 3->entry_etat_final_compteur 4->entry_etat_initial_compteur_Mohcine 5->entry_etat_final_compteur_Mohcine 6->entry_etat_initial_compteur_Mustafa 7->entry_etat_final_compteur_Mustafa
+        self.date=[]
         self.create_title("insérer vos informations",10)
         frame_form=Frame(self.canvas,bd=2,relief="raised")
         frame_RADEEJ=Frame(frame_form)
@@ -156,9 +159,6 @@ class MyApp:
         label_m_etat_final_Mustafa.grid(row=0,column=1)
         frame_compteur_Mustafa_final.grid(row=1,column=1,padx=10)        
         frame_compteur_Mustafa.pack()
-        label_space=Label(frame_form,text="")
-        label_space.pack()
-        self.canvas.create_window(self.width*4/10,self.height*9/20+self.padding*3/4,window=frame_form)
         if not self.data_entries :
             self.data_entries=[-1 for _ in range(len(self.entries_form))]
         else :
@@ -168,6 +168,36 @@ class MyApp:
                         self.entries_form[index].delete(0,END)
                         self.entries_form[index].config(fg=self.entry_text_color)
                     self.entries_form[index].insert(0,self.data_entries[index])
+        label_line_4=Label(frame_form,text="_____________________________________________________________")
+        label_line_4.pack()
+        #add ComboBox  date
+        
+        self.yy,self.mm,self.dd=list(map(int,str(datetime.datetime.now()).split()[0].split('-')))
+        self.current_dd_mm_yy=[self.dd,self.mm,self.yy]
+        frame_date=Frame(frame_form)
+        label_date=Label(frame_date,font=(self.text_familly,self.label_text_size,self.font_style),fg=self.label_text_color,bg=self.label_background_color,relief="solid",text="Date (Jour/Mois/Année) : ",width=40)
+        label_date.grid(row=0,column=0,padx=20)
+        frame_date_combo_box=Frame(frame_date)
+        self.date.append(ttk.Combobox(frame_date_combo_box,value=["01","02","03","04","05","06","07","08","09"]+list(range(10,32)),font=(self.text_familly,self.label_text_size,self.font_style),width=7))
+        self.date[0].current(self.dd-1)
+        self.date[0].grid(row=0,column=0)
+        self.date.append(ttk.Combobox(frame_date_combo_box,value=["01","02","03","04","05","06","07","08","09","10","11","12"],font=(self.text_familly,self.label_text_size,self.font_style),width=8))
+        self.date[1].current(self.mm-1)
+        self.date[1].grid(row=0,column=1)
+        self.date.append(ttk.Combobox(frame_date_combo_box,value=[self.yy-1,self.yy],font=(self.text_familly,self.label_text_size,self.font_style),width=8))
+        self.date[2].current(1)
+        self.date[2].grid(row=0,column=2)
+
+        frame_date_combo_box.grid(row=0,column=1,padx=10)
+        frame_date.pack(pady=15)
+        self.canvas.create_window(self.width*4/10,self.height*9/20+self.padding*3/4,window=frame_form)
+        #bind the ComboBox
+        self.date[0].bind("<Button-1>",self.jj_bind)
+        self.date[1].bind("<Button-1>",self.mm_bind)
+        self.date[2].bind("<Button-1>",self.yy_bind)
+        for combobox in self.date:
+            combobox.bind("<FocusIn>",self.focus_in_combobox)
+            combobox.bind("<FocusOut>",self.focus_out_combobox)
         #bind the enties to get position
         self.entries_form[0].bind("<Button-1>",self.entry_0)
         self.entries_form[1].bind("<Button-1>",self.entry_1)
@@ -188,10 +218,10 @@ class MyApp:
         button_calculer=Button(self.canvas,fg=self.button_C_color,bg=self.button_C_background_color,font=(self.text_familly,self.text_C_size,self.font_style),text="Calculer",width=17)
         button_ajouter_image=Button(self.canvas,fg=self.button_C_color,bg=self.button_C_background_color,font=(self.text_familly,self.text_C_size,self.font_style),text="Ajouter une image",width=17)
         button_supprimer_image=Button(self.canvas,fg=self.button_C_color,bg=self.button_C_background_color,font=(self.text_familly,self.text_C_size,self.font_style),text="supprimer une image",width=17)
-        self.canvas.create_window(self.width/8,self.height*10/11,window=button_menu)
-        self.canvas.create_window(self.width*3/8,self.height*10/11,window=button_calculer)
-        self.canvas.create_window(self.width*5/8,self.height*10/11,window=button_ajouter_image)
-        self.canvas.create_window(self.width*7/8,self.height*10/11,window=button_supprimer_image)
+        self.canvas.create_window(self.width/8,self.height*17/18,window=button_menu)
+        self.canvas.create_window(self.width*3/8,self.height*17/18,window=button_calculer)
+        self.canvas.create_window(self.width*5/8,self.height*17/18,window=button_ajouter_image)
+        self.canvas.create_window(self.width*7/8,self.height*17/18,window=button_supprimer_image)
     
     #bind's functions to get position
     def entry_0(self,*args):
@@ -210,7 +240,12 @@ class MyApp:
         self.next_focus_entry=6
     def entry_7(self,*args):
         self.next_focus_entry=7
-        
+    def jj_bind(self,*args):
+        self.index_next_focus_combobox=0
+    def mm_bind(self,*args):
+        self.index_next_focus_combobox=1
+    def yy_bind(self,*args):
+        self.index_next_focus_combobox=2
     #bind's functions
     def focus_in_entry(self,*args)->None:
         self.current_focus_entry,self.next_focus_entry=self.next_focus_entry,-1
@@ -237,7 +272,28 @@ class MyApp:
     def down_entry(self,*args):
         self.next_focus_entry=(self.current_focus_entry+1)%len(self.entries_form)
         self.entries_form[self.next_focus_entry].focus()
-
+    def focus_in_combobox(self,*args):
+        self.index_focus_combobox,self.index_next_focus_combobox=self.index_next_focus_combobox,-1
+        try :
+            self.current_dd_mm_yy[self.index_focus_combobox]=int(self.date[self.index_focus_combobox].get())
+        except :
+            self.insert_date_combobox(self.index_focus_combobox)
+        for i in range(3):
+            self.insert_date_combobox(i)
+    def focus_out_combobox(self,*args):
+        try:
+            value=int(self.date[self.index_focus_combobox].get())
+            if self.index_focus_combobox==0 and value not in range(1,32):
+                raise ValueError("le jour devrait etre entre 1 et 31 !!")
+            elif self.index_focus_combobox==1 and value not in range(1,13):
+                raise ValueError("le mois devrait etre entre 1 et 12 !!")
+            elif self.index_focus_combobox==2 and value!=self.yy-1 and value!=self.yy:
+                raise ValueError(f"l'année' devrait etre entre {self.yy-1} ou {self.yy} !!")
+            self.current_dd_mm_yy[self.index_focus_combobox]=value
+        except :
+            self.insert_date_combobox(self.index_focus_combobox)
+        for i in range(3):
+            self.insert_date_combobox(i)
     #button's functions
     def button_calculer(self):
         self.clean_window()
@@ -249,6 +305,12 @@ class MyApp:
         self.clean_window()
         self.create_menu()
     #other
+    def insert_date_combobox(self,index):
+        if index in range(2):
+            self.date[index].current(self.current_dd_mm_yy[index]-1)
+        elif index==2:
+            self.date[index].current(1-self.yy+self.current_dd_mm_yy[index])
+
     def clean_window(self):
         self.canvas.destroy()
         self.create_canvas()
