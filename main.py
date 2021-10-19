@@ -6,14 +6,21 @@ import datetime
 from PIL import ImageTk , Image
 class MyApp:
     def __init__(self):
+        self.window=Tk()
         #size window
-        self.width=1100
-        self.height=self.width*720//1028
-        self.title_size=50
-        self.text_M_size=30
-        self.text_C_size=17
-        self.label_text_size=15
-        self.padding=100
+        self.coefficient=9/10
+        self.screen_width=self.window.winfo_screenwidth()+100
+        self.screen_height=self.window.winfo_screenheight()
+        self.width=int(self.screen_width*self.coefficient)
+        self.height=int(self.screen_height*self.coefficient)
+        self.title_size=self.automate_size(50)
+        self.text_M_size=self.automate_size(30)
+        self.text_C_size=self.automate_size(17)
+        self.label_text_size=self.automate_size(15)
+        self.padding=self.automate_height(100)
+        self.height_p=self.automate_height(5)
+        self.height_p_c=self.automate_height(10)
+        self.width_line=self.automate_width(5)
         #title
         self.title="Cytro"
         #path
@@ -39,10 +46,9 @@ class MyApp:
         self.given_dd_mm_yy=[]
         self.images=[]
         #window
-        self.window=Tk()
         self.window.title(self.title)
         self.window.iconbitmap(self.logo_path)
-        self.window.geometry(f"{self.width}x{self.height}")
+        self.window.geometry(f"{self.width}x{self.height}+{(self.screen_width-self.width)//2}+{(self.screen_height*9//10-self.height)//2}")
         self.window.resizable(False,False)
         self.create_canvas()
         self.create_menu()
@@ -55,28 +61,29 @@ class MyApp:
             bg=ImageTk.PhotoImage(bg)
             self.canvas.create_image(0,0,image=bg,anchor="nw")
         self.canvas.pack()
-    def create_title(self,this_text:str,height_porcentage:int)->None:
-        self.canvas.create_text(self.width/2,self.height/height_porcentage,text=this_text,font=(self.text_familly,self.title_size,self.title_font_style),fill=self.title_color)
+    def create_title(self,this_text:str,por:int)->None:
+        por=self.automate_height(por)
+        self.canvas.create_text(self.width/2,self.height/por,text=this_text,font=(self.text_familly,self.title_size,self.title_font_style),fill=self.title_color)   
     def create_menu(self):
         # create title 
-        self.create_title("Menu",5)
+        self.create_title("Menu",self.height_p)
         #create buttons
-        button_calculer=Button(self.canvas,text="Calculer",bg=self.button_M_background_color,fg=self.button_M_color,font=(self.text_familly,self.text_M_size,self.font_style),width=20,command=self.button_calculer)
-        button_historique=Button(self.canvas,text="Historique",bg=self.button_M_background_color,fg=self.button_M_color,font=(self.text_familly,self.text_M_size,self.font_style),width=20)
+        button_calculer=Button(self.canvas,text="Calculer",bg=self.button_M_background_color,fg=self.button_M_color,font=(self.text_familly,self.text_M_size,self.font_style),width=self.automate_width(20),command=self.button_calculer)
+        button_historique=Button(self.canvas,text="Historique",bg=self.button_M_background_color,fg=self.button_M_color,font=(self.text_familly,self.text_M_size,self.font_style),width=self.automate_width(20))
         self.canvas.create_window(self.width/2,self.height/5+self.padding,window=button_calculer)
         self.canvas.create_window(self.width/2,self.height/5+2*self.padding,window=button_historique)
         #create border
-        self.canvas.create_line(self.width/2-100,self.height/5,self.width/2-300,self.height/5,fill=self.border_color,width=5)
-        self.canvas.create_line(self.width/2-300,self.height/5,self.width/2-300,self.height/5+300,fill=self.border_color,width=5)
-        self.canvas.create_line(self.width/2-300,self.height/5+300,self.width/2+300,self.height/5+300,fill=self.border_color,width=5)
-        self.canvas.create_line(self.width/2+300,self.height/5+300,self.width/2+300,self.height/5,fill=self.border_color,width=5)
-        self.canvas.create_line(self.width/2+300,self.height/5,self.width/2+100,self.height/5,fill=self.border_color,width=5)
+        self.canvas.create_line(self.width/2-self.automate_width(100),self.height/self.height_p,self.width/2-self.automate_width(300) , self.height/self.height_p,fill=self.border_color,width=self.width_line)
+        self.canvas.create_line(self.width/2-self.automate_width(300),self.height/self.height_p-self.automate_height(2),self.width/2-self.automate_width(300),self.height/self.height_p+self.automate_height(303),fill=self.border_color,width=self.width_line)
+        self.canvas.create_line(self.width/2-self.automate_width(300),self.height/self.height_p+self.automate_height(300),self.width/2+self.automate_width(300),self.height/self.height_p+self.automate_height(300),fill=self.border_color,width=self.width_line)
+        self.canvas.create_line(self.width/2+self.automate_width(300),self.height/self.height_p+self.automate_height(303),self.width/2+self.automate_width(300),self.height/self.height_p-self.automate_height(2),fill=self.border_color,width=self.width_line)
+        self.canvas.create_line(self.width/2+self.automate_width(300),self.height/self.height_p,self.width/2+self.automate_width(100) , self.height/self.height_p,fill=self.border_color,width=self.width_line)
     def create_form(self):
         self.current_focus_entry,self.next_focus_entry=-1,-1
         self.index_focus_combobox=-1
         self.entries_form=[] # 0->entry_consommation_RADEEJ 1->entry_prix_RADEEJ 2->entry_etat_initial_compteur 3->entry_etat_final_compteur 4->entry_etat_initial_compteur_Mohcine 5->entry_etat_final_compteur_Mohcine 6->entry_etat_initial_compteur_Mustafa 7->entry_etat_final_compteur_Mustafa
         self.date=[]# 0->day 1->mounth 2->year
-        self.create_title("insérer vos informations",10)
+        self.create_title("insérer vos informations",self.height_p_c)
         frame_form=Frame(self.canvas,bd=2,relief="raised")
         frame_RADEEJ=Frame(frame_form)
         label_consommation_RADEEJ=Label(frame_RADEEJ,font=(self.text_familly,self.label_text_size,self.font_style),fg=self.label_text_color,bg=self.label_background_color,relief="solid",text="Consommation donnée par la RADEEJ : ",width=40)
@@ -203,6 +210,7 @@ class MyApp:
         
         for combobox in self.date:
             combobox.bind("<FocusIn>",self.check_date_combobox)
+            combobox.bind("<FocusOut>",self.check_date_combobox)
             combobox.bind("<Right>",self.right_combobox)
             combobox.bind("<Left>",self.left_combobox)
             combobox.bind("<Up>",self.up_combobox)
@@ -366,5 +374,11 @@ class MyApp:
             if self.next_focus_entry!=self.current_focus_entry and self.current_focus_entry in range(len(self.entries_form)) and self.next_focus_entry in range(len(self.entries_form)) :
                 self.data_entries[self.current_focus_entry]=-1
             return False
+    def automate_size(self,size:int)->int:
+        return int(self.width*self.height*size//1152//648)
+    def automate_width(self,width:int)->int:
+        return int(self.width*width//1152)
+    def automate_height(self,height:int)->int:
+        return int(self.height*height//648)
 if __name__=="__main__" :
     app=MyApp()
