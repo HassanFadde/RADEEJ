@@ -9,7 +9,7 @@ class MyApp:
         self.window=Tk()
         #size window
         self.coefficient=9/10
-        self.screen_width=self.window.winfo_screenwidth()+100
+        self.screen_width=self.window.winfo_screenwidth()
         self.screen_height=self.window.winfo_screenheight()
         self.width=int(self.screen_width*self.coefficient)
         self.height=int(self.screen_height*self.coefficient)
