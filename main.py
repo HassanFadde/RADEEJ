@@ -303,7 +303,7 @@ class MyApp:
         self.next_focus_entry=(self.current_focus_entry+1)%len(self.entries_form)
         self.entries_form[self.next_focus_entry].focus()
     def left_combobox(self,*args):
-        self.date[self.index_focus_combobox].focus()
+        self.check_date_combobox()
         if self.index_focus_combobox==0:
             self.next_focus_entry=len(self.entries_form)-1
             self.entries_form[self.next_focus_entry].focus()
@@ -311,7 +311,7 @@ class MyApp:
         self.index_focus_combobox=2-(3-self.index_focus_combobox)%3
         self.date[self.index_focus_combobox].focus()
     def right_combobox(self,*args):
-        self.date[self.index_focus_combobox].focus()
+        self.check_date_combobox()
         if self.index_focus_combobox==2:
             self.next_focus_entry=0
             self.entries_form[self.next_focus_entry].focus()
@@ -319,7 +319,7 @@ class MyApp:
         self.index_focus_combobox=(self.index_focus_combobox+1)%3
         self.date[self.index_focus_combobox].focus()
     def up_combobox(self,*args):
-        self.date[self.index_focus_combobox].focus()
+        self.check_date_combobox()
         self.next_focus_entry=len(self.entries_form)-1
         self.entries_form[self.next_focus_entry].focus()    
     #button's functions
