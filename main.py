@@ -203,6 +203,7 @@ class MyApp:
         
         for combobox in self.date:
             combobox.bind("<FocusIn>",self.check_date_combobox)
+            combobox.bind("<FocusOut>",self.check_date_combobox)
             combobox.bind("<Right>",self.right_combobox)
             combobox.bind("<Left>",self.left_combobox)
             combobox.bind("<Up>",self.up_combobox)
@@ -321,7 +322,6 @@ class MyApp:
         self.date[self.index_focus_combobox].focus()
         self.next_focus_entry=len(self.entries_form)-1
         self.entries_form[self.next_focus_entry].focus()    
-
     #button's functions
     def button_calculer(self):
         self.clean_window()
